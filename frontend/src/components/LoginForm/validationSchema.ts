@@ -20,15 +20,15 @@ export const editUserValidationSchema = Yup.object().shape({
 });
 
 export const taskValidationSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
+  taskName: Yup.string().required("Name is required"),
   description: Yup.string().required("Description is required"),
   dueDate: Yup.date().required("Due date is required"),
-  priority: Yup.string()
+  priorityLevel: Yup.string()
     .required("Priority is required")
     .oneOf(["high", "medium", "low"], "Invalid priority"),
   status: Yup.string()
     .required("Status is required")
-    .oneOf(["pending", "completed", "in progress"], "Invalid status"),
+    .oneOf(["not_started", "in_progress", "completed"], "Invalid status"),
 });
 
 export const signUpValidationSchema = Yup.object().shape({

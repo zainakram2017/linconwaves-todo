@@ -1,18 +1,21 @@
+import { useTask } from "../../contexts/TaskContext";
 import PageHeader from "../PageHeader/PageHeader";
 import { FaRegEdit } from "react-icons/fa";
+import toast from "react-hot-toast";
 import { RiDeleteBinLine } from "react-icons/ri";
 import TaskForm from "./TaskForm";
 import DeleteWarningModal from "../Modals/DeleteWarningModal";
-import { useEffect, useState } from "react";
-import { Task } from "../../types/TaskType";
-import { getAllTasks } from "../../apiCalls";
+import { useState } from "react";
+import { Task } from "../../types/TaskTypes";
+import { deleteTaskHandler } from "../../apiCalls";
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState<Task[] | null>([]);
+  const { tasks, fetchData } = useTask();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditForm, setIsEditForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<Task>({} as Task);
   const header = [
     { label: "Name", className: "" },
     { label: "Description", className: "hidden  sm:block" },
@@ -21,26 +24,20 @@ const Tasks = () => {
     { label: "Status", className: "" },
   ];
 
-  const deleteUser = () => {
-    console.log("delete user");
+  const deleteTask = async () => {
     setIsLoading(true);
-  };
 
-  const fetchData = async () => {
-    setIsLoading(true);
     try {
-      const response = await getAllTasks();
-      setTasks(response);
+      await deleteTaskHandler(selectedRecord._id);
+      fetchData();
+      toast.success("task deleted successfully");
     } catch (error) {
-      console.error(error);
+      console.log(error);
     } finally {
       setIsLoading(false);
+      setIsDeleteModalOpen(false);
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <>
@@ -49,11 +46,12 @@ const Tasks = () => {
         setIsModalOpen={setIsModalOpen}
         setIsEditForm={setIsEditForm}
         isEditForm={isEditForm}
+        selectedRecord={selectedRecord}
       />
       <DeleteWarningModal
         isModalOpen={isDeleteModalOpen}
         setIsModalOpen={setIsDeleteModalOpen}
-        actionHandler={deleteUser}
+        actionHandler={() => deleteTask()}
         isLoading={isLoading}
       />
       <div className="px-4 sm:px-6 lg:px-8">
@@ -102,11 +100,7 @@ const Tasks = () => {
                     {item.description}
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">
-                    {new Intl.DateTimeFormat('en-US', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                    }).format(new Date(item.dueDate))}
+                    {item.dueDate.slice(0, 10)}
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">
                     {item.priorityLevel}
@@ -122,12 +116,17 @@ const Tasks = () => {
                         onClick={() => {
                           setIsEditForm(true);
                           setIsModalOpen(true);
+                          setSelectedRecord(item);
                         }}
                       />
                       <RiDeleteBinLine
                         className="text-red-600 hover:text-red-500"
                         size={18}
-                        onClick={() => setIsDeleteModalOpen(true)}
+                        onClick={() => {
+                          setIsDeleteModalOpen(true)
+                          setSelectedRecord(item);
+                        }}
+                        
                       />
                     </div>
                   </td>

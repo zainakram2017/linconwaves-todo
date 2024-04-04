@@ -7,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 const App: React.FC = () => {
   return (
     <>
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="bottom-center" reverseOrder={false} />
       <AuthProvider>
         <Routes />
       </AuthProvider>

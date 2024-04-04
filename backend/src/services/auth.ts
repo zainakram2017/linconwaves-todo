@@ -24,7 +24,7 @@ export const signUpHandler = async (req: RequestObject, res: Response, next: Nex
             name,
             email,
             password: hashedPassword,
-            role: 'user',
+            role: 'admin',
         });
 
         await user.save();

@@ -3,6 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { signUpValidationSchema } from "../LoginForm/validationSchema";
 import { Link, useNavigate } from "react-router-dom";
 import { signUpHandler } from "../../apiCalls";
+import toast from "react-hot-toast";
 
 const CreateUser = () => {
   const initialValues = {
@@ -20,7 +21,7 @@ const CreateUser = () => {
       onSubmit={async (values) => {
         const res = await signUpHandler(values);
         if (res?.id) {
-          console.log("success");
+          toast.success("Account created successfully");
           navigate("/login");
           return;
         }

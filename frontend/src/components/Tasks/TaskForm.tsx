@@ -1,3 +1,4 @@
+import { Task } from "../../types/TaskTypes";
 import Modal from "../Modals/Modal";
 import CreateEditTask from "./CreateEditTask";
 
@@ -6,12 +7,14 @@ type TaskFormProps = {
   isEditForm: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsEditForm: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedRecord: Task;
 };
 const TaskForm = ({
   isModalOpen,
   isEditForm,
   setIsModalOpen,
   setIsEditForm,
+  selectedRecord
 }: TaskFormProps) => {
   return (
     <div >
@@ -26,14 +29,8 @@ const TaskForm = ({
     >
       <CreateEditTask
         isEditForm={isEditForm}
-        taskData={{
-          uuid: 567890,
-          name: "Task1",
-          description: "this task is very important",
-          dueDate: "2022-10-10",
-          priority: "high",
-          status: "pending",
-        }}
+        taskData={selectedRecord}
+        setIsModalOpen={setIsModalOpen}
       />
     </Modal>
     </div>

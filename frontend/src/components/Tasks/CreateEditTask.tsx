@@ -1,31 +1,32 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import toast from "react-hot-toast";
 
 import { taskValidationSchema } from "../LoginForm/validationSchema";
+import { createTaskHandler, updateTaskHandler } from "../../apiCalls";
+
+import { Task } from "../../types/TaskTypes";
+import { useTask } from "../../contexts/TaskContext";
 
 type CreateEditTaskProps = {
   isEditForm: boolean;
-  taskData: {
-    uuid: number;
-    name: string;
-    description: string;
-    dueDate: string;
-    priority: string;
-    status: string;
-  };
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  taskData: Task
 };
-const CreateEditTask = ({ isEditForm, taskData }: CreateEditTaskProps) => {
+
+const CreateEditTask = ({ isEditForm, taskData, setIsModalOpen }: CreateEditTaskProps) => {
+  const { fetchData } = useTask();
   const statusOptions = [
     {
-      label: "Pending",
-      value: "pending",
+      label: "Not Started",
+      value: "not_started",
+    },
+    {
+      label: "In Progress",
+      value: "in_progress",
     },
     {
       label: "Completed",
       value: "completed",
-    },
-    {
-      label: "In Progress",
-      value: "inProgress",
     },
   ];
 
@@ -45,20 +46,34 @@ const CreateEditTask = ({ isEditForm, taskData }: CreateEditTaskProps) => {
   ];
 
   const initialValues = isEditForm
-    ? taskData
+    ? {
+        ...taskData,
+        dueDate: taskData.dueDate.slice(0, 10),
+      }
     : {
-        name: "",
+        taskName: "",
         description: "",
         dueDate: "",
-        priority: "",
-        status: "pending",
+        priorityLevel: "",
+        status: "",
       };
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={taskValidationSchema}
-      onSubmit={(values) => {
-        console.log(values, "kjhjhj");
+      onSubmit={async (values) => {
+        const res = isEditForm
+          ? await updateTaskHandler(values, taskData._id)
+          : await createTaskHandler(values);
+        
+        fetchData();
+
+        if (res?._id) {
+          toast.success("Action successfully performed!");
+          setIsModalOpen(false);
+          return;
+        }
+        toast.error("Something went wrong! try again");
       }}
     >
       {({ isSubmitting }) => (
@@ -73,13 +88,13 @@ const CreateEditTask = ({ isEditForm, taskData }: CreateEditTaskProps) => {
             <div className="mt-2">
               <Field
                 id="name"
-                name="name"
+                name="taskName"
                 type="text"
                 autoComplete="name"
                 className="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
               <ErrorMessage
-                name="name"
+                name="taskName"
                 component="div"
                 className="text-red-500 text-sm mt-1"
               />
@@ -113,7 +128,7 @@ const CreateEditTask = ({ isEditForm, taskData }: CreateEditTaskProps) => {
               htmlFor="dueDate"
               className="block text-sm font-medium leading-6 text-gray-900"
             >
-              dueDate
+              Due Date
             </label>
             <div className="mt-2">
               <Field
@@ -134,7 +149,7 @@ const CreateEditTask = ({ isEditForm, taskData }: CreateEditTaskProps) => {
 
           <div>
             <label
-              htmlFor="priority"
+              htmlFor="priorityLevel"
               className="block text-sm font-medium leading-6 text-gray-900"
             >
               Priority
@@ -142,7 +157,7 @@ const CreateEditTask = ({ isEditForm, taskData }: CreateEditTaskProps) => {
             <div className="mt-2">
               <Field
                 id="priority"
-                name="priority"
+                name="priorityLevel"
                 as="select"
                 autoComplete="current-priority"
                 className="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -157,7 +172,7 @@ const CreateEditTask = ({ isEditForm, taskData }: CreateEditTaskProps) => {
                 ))}
               </Field>
               <ErrorMessage
-                name="priority"
+                name="priorityLevel"
                 component="div"
                 className="text-red-500 text-sm mt-1"
               />
@@ -168,7 +183,7 @@ const CreateEditTask = ({ isEditForm, taskData }: CreateEditTaskProps) => {
               htmlFor="status"
               className="block text-sm font-medium leading-6 text-gray-900"
             >
-              status
+              Status
             </label>
             <div className="mt-2">
               <Field

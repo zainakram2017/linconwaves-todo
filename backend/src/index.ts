@@ -1,11 +1,13 @@
 import express, { urlencoded, Request, Response } from 'express';
 import mongoose from 'mongoose';
+import cors from 'cors';
 
 import { appRouter as appRoutes } from './routes';
 import secrets from '../secrets';
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(urlencoded({ extended: false }));
 

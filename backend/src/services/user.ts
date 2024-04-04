@@ -18,7 +18,7 @@ export const createUserHandler = async (req: RequestObject, res: Response, next:
         user.password = hashedPassword;
         await user.save();
         res.status(201).json({
-            uuid: user._id,
+            _id: user._id,
             name: user.name,
             email: user.email
         });
@@ -56,7 +56,7 @@ export const updateUserHandler = async (req: RequestObject, res: Response, next:
             });
             await user.save();
             res.status(200).json({
-                uuid: user._id,
+                _id: user._id,
                 name: user.name,
                 email: user.email
             });
@@ -73,7 +73,7 @@ export const deleteUserHandler = async (req: RequestObject, res: Response, next:
             next(new HttpException(404, 'User not found', []));
         } else {
             res.status(200).json({
-                uuid: user._id,
+                _id: user._id,
                 name: user.name,
                 email: user.email
             });
@@ -90,7 +90,8 @@ export const getAllUsersHandler = async (req: RequestObject, res: Response, next
             return {
                 _id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                role: user.role
             };
         });
         res.status(200).json(modifiedUsers);                

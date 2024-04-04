@@ -62,7 +62,7 @@ export const deleteTodoHandler = async (req: RequestObject, res: Response, next:
 
 export const getAllTodosHandler = async (req: RequestObject, res: Response, next: NextFunction) => {
     try {
-        const todos = await Todo.find({ user: req.currentUser?.uuid });
+        const todos = await Todo.find();        
         res.status(200).json(todos);
     } catch (error: any) {
         next(new HttpException(400, error?.message, error));
